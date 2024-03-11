@@ -1,7 +1,4 @@
-import {
-  ArgumentMetadata,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { ArgumentMetadata, ParseUUIDPipe } from '@nestjs/common';
 
 export class CustomUUIDPipe extends ParseUUIDPipe {
   async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
