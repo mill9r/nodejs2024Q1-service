@@ -45,7 +45,6 @@ export class FavoritesController {
     this.tracksService.deleteArtist(id);
   }
 
-
   @Post('album/:id')
   @HttpCode(HttpStatus.CREATED)
   addAlbum(@Param('id', CustomUUIDPipe) id: string) {

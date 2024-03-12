@@ -85,7 +85,6 @@ export class ArtistsService {
     );
 
     if (album !== -1 && this.dbService.albumRepository[album].artistId === id) {
-
       this.dbService.albumRepository[album].artistId = null;
     }
 
