@@ -62,6 +62,23 @@ export class AlbumsService {
     if (index === -1) {
       throw new CustomNotFoundException(ALBUM_NOT_FOUND);
     }
+
+    const favoriteTrack = this.dbService.favorites.albums.findIndex(
+      (t) => t.id === id,
+    );
+
+    if (favoriteTrack !== -1) {
+      this.dbService.favorites.albums.splice(favoriteTrack, 1);
+    }
+
+    const track = this.dbService.trackRepository.findIndex(
+      (t) => t.albumId === id,
+    );
+
+    if (track !== -1) {
+      this.dbService.trackRepository[track].albumId = null;
+    }
+
     this.dbService.albumRepository.splice(index, 1);
   }
 }

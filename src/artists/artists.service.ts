@@ -63,6 +63,32 @@ export class ArtistsService {
     if (index === -1) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
+
+    const favoriteArtist = this.dbService.favorites.artists.findIndex(
+      (t) => t.id === id,
+    );
+
+    if (favoriteArtist !== -1) {
+      this.dbService.favorites.artists.splice(favoriteArtist, 1);
+    }
+
+    const track = this.dbService.trackRepository.findIndex(
+      (t) => t.artistId === id,
+    );
+
+    if (track !== -1) {
+      this.dbService.trackRepository[track].artistId = null;
+    }
+
+    const album = this.dbService.albumRepository.findIndex(
+      (t) => t.artistId === id,
+    );
+
+    if (album !== -1 && this.dbService.albumRepository[album].artistId === id) {
+
+      this.dbService.albumRepository[album].artistId = null;
+    }
+
     this.dbService.artistRepository.splice(index, 1);
   }
 }

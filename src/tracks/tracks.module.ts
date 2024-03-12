@@ -7,5 +7,6 @@ import { TracksController } from './tracks.controller';
   imports: [DbModule],
   controllers: [TracksController],
   providers: [TracksService],
+  exports: [TracksService],
 })
 export class TracksModule {}

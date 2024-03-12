@@ -62,6 +62,15 @@ export class TracksService {
     if (index === -1) {
       throw new CustomNotFoundException(TRACK_NOT_FOUND);
     }
+
+    const track = this.dbService.favorites.tracks.findIndex(
+      (user) => user.id === id,
+    );
+
+    if (track !== -1) {
+      this.dbService.favorites.tracks.splice(track, 1);
+    }
+
     this.dbService.trackRepository.splice(index, 1);
   }
 }

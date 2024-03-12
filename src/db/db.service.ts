@@ -4,6 +4,12 @@ import { Artist } from '../artists/entities/artist.entity';
 import { Album } from '../albums/entities/album.entity';
 import { Track } from '../tracks/entities/track.entity';
 
+export interface Favorites {
+  artists: Artist[];
+  albums: Album[];
+  tracks: Track[];
+}
+
 @Injectable()
 export class DbService {
   public userRepository: User[] = [];
@@ -11,9 +17,9 @@ export class DbService {
   public artistRepository: Artist[] = [];
   public albumRepository: Album[] = [];
   public trackRepository: Track[] = [];
-  public favorites = {
-    // artists: Artist[],
-    // albums: Album[]: [],
-    // tracks: Track[]: []
+  public favorites: Favorites = {
+    artists: [],
+    albums: [],
+    tracks: [],
   };
 }
