@@ -10,43 +10,43 @@ import {
   Put,
   ValidationPipe,
 } from '@nestjs/common';
-import { ArtistsService } from './artists.service';
+import { AlbumsService } from './albums.service';
 import { CustomUUIDPipe } from '../pipes/custom-uuid.filter';
-import { ArtistDto } from './dto/artist.dto';
+import { AlbumDto } from './dto/album.dto';
 
-@Controller('artists')
-export class ArtistsController {
-  constructor(private readonly artistsService: ArtistsService) {}
+@Controller('albums')
+export class AlbumsController {
+  constructor(private readonly albumsService: AlbumsService) {}
   @Get()
   @HttpCode(HttpStatus.OK)
   getAll() {
-    return this.artistsService.getAll();
+    return this.albumsService.getAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   get(@Param('id', CustomUUIDPipe) id: string) {
-    return this.artistsService.get(id);
+    return this.albumsService.get(id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body(ValidationPipe) body: ArtistDto) {
-    return this.artistsService.create(body);
+  create(@Body(ValidationPipe) body: AlbumDto) {
+    return this.albumsService.create(body);
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   update(
     @Param('id', CustomUUIDPipe) id: string,
-    @Body(ValidationPipe) body: ArtistDto,
+    @Body(ValidationPipe) body: AlbumDto,
   ) {
-    return this.artistsService.update(id, body);
+    return this.albumsService.update(id, body);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   delete(@Param('id', CustomUUIDPipe) id: string) {
-    this.artistsService.delete(id);
+    this.albumsService.delete(id);
   }
 }

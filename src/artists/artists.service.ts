@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DbService } from '../db/db.service';
 import { CustomNotFoundException } from '../exceptions/record-not-exist.exception';
 import { ArtistDto } from './dto/artist.dto';
+import { ARTIST_NOT_FOUND } from './constants/artist.constant';
 @Injectable()
 export class ArtistsService {
   constructor(private dbService: DbService) {}
@@ -23,7 +24,7 @@ export class ArtistsService {
       (user) => user.id === id,
     );
     if (!artist) {
-      throw new CustomNotFoundException('Artist not found');
+      throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
 
     const updatedUser = {
@@ -49,7 +50,7 @@ export class ArtistsService {
     );
 
     if (index === -1) {
-      throw new CustomNotFoundException('Artist not found');
+      throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
 
     return this.dbService.artistRepository[index];
@@ -60,7 +61,7 @@ export class ArtistsService {
       (user) => user.id === id,
     );
     if (index === -1) {
-      throw new CustomNotFoundException('Artist not found');
+      throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
     this.dbService.artistRepository.splice(index, 1);
   }
