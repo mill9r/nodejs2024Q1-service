@@ -15,7 +15,7 @@ import { CustomUUIDPipe } from '../pipes/custom-uuid.filter';
 import { TracksService } from './tracks.service';
 import { TrackDto } from './dto/track.dto';
 
-@Controller('tracks')
+@Controller('track')
 export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
   @Get()

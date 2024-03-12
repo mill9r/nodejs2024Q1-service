@@ -8,14 +8,16 @@ import {
   Param,
   Post,
   Put,
+  UseFilters,
   ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CustomUUIDPipe } from '../pipes/custom-uuid.filter';
+import { WrongPasswordExceptionFilter } from '../exceptions/wrong-password.filter';
 
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get()
@@ -38,6 +40,7 @@ export class UsersController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @UseFilters(WrongPasswordExceptionFilter)
   update(
     @Param('id', CustomUUIDPipe) id: string,
     @Body(ValidationPipe) body: UpdatePasswordDto,

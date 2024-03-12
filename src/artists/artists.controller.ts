@@ -14,7 +14,7 @@ import { ArtistsService } from './artists.service';
 import { CustomUUIDPipe } from '../pipes/custom-uuid.filter';
 import { ArtistDto } from './dto/artist.dto';
 
-@Controller('artists')
+@Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
   @Get()

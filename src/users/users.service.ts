@@ -5,6 +5,7 @@ import { DbService } from '../db/db.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CustomNotFoundException } from '../exceptions/record-not-exist.exception';
 import { WrongPasswordException } from '../exceptions/wrong-password.exception';
+import { USER_NOT_FOUND } from './constants/constants';
 @Injectable()
 export class UsersService {
   constructor(private dbService: DbService) {}
@@ -29,12 +30,18 @@ export class UsersService {
   update(id: string, inUser: UpdatePasswordDto) {
     const user = this.dbService.userCredentialsRepository.get(id);
     if (!user) {
-      throw new CustomNotFoundException('User not found');
+      throw new CustomNotFoundException(USER_NOT_FOUND);
     }
     if (user !== inUser.oldPassword) {
       throw new WrongPasswordException('Old password is incorrect');
     }
 
+    this.dbService.userRepository.forEach((i) => {
+      if (i.id === id) {
+        i.updatedAt = Date.now();
+        i.version++;
+      }
+    });
     this.dbService.userCredentialsRepository.set(id, inUser.newPassword);
     return this.get(id);
   }
@@ -49,7 +56,7 @@ export class UsersService {
     );
 
     if (index === -1) {
-      throw new CustomNotFoundException('User not found');
+      throw new CustomNotFoundException(USER_NOT_FOUND);
     }
 
     return this.dbService.userRepository[index];
@@ -60,7 +67,7 @@ export class UsersService {
       (user) => user.id === id,
     );
     if (index === -1) {
-      throw new CustomNotFoundException('User not found');
+      throw new CustomNotFoundException(USER_NOT_FOUND);
     }
     this.dbService.userRepository.splice(index, 1);
     this.dbService.userCredentialsRepository.delete(id);

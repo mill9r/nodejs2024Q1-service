@@ -14,7 +14,7 @@ import { AlbumsService } from './albums.service';
 import { CustomUUIDPipe } from '../pipes/custom-uuid.filter';
 import { AlbumDto } from './dto/album.dto';
 
-@Controller('albums')
+@Controller('album')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
   @Get()
