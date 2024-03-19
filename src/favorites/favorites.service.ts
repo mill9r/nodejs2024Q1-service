@@ -38,7 +38,7 @@ export class FavoritesService {
 
   addAlbum(id: string) {
     const album = this.albumsService.get(id);
-    this.dbService.favorites.albums.push(album);
+    // this.dbService.favorites.albums.push(album);
   }
 
   deleteAlbum(id: string) {
@@ -53,7 +53,7 @@ export class FavoritesService {
 
   addArtist(id: string) {
     const artist = this.artistsService.get(id);
-    this.dbService.favorites.artists.push(artist);
+    // this.dbService.favorites.artists.push(artist);
   }
 
   deleteArtist(id: string) {
