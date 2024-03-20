@@ -5,7 +5,7 @@ import { Track } from '../../tracks/entities/track.entity';
 @Entity()
 export class Artist {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  artistId: string;
 
   @Column()
   name: string;

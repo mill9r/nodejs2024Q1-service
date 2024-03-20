@@ -19,7 +19,7 @@ export class ArtistsService {
 
   async update(id: string, inUser: ArtistDto) {
     const artist = await this.artistRepository.preload({
-      id,
+      artistId: id,
       ...inUser,
     });
     if (!artist) {
@@ -33,7 +33,9 @@ export class ArtistsService {
   }
 
   async get(id: string) {
-    const artist = await this.artistRepository.findOne({ where: { id } });
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
 
     if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
@@ -43,7 +45,9 @@ export class ArtistsService {
   }
 
   async delete(id: string) {
-    const artist = await this.artistRepository.findOne({ where: { id } });
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
 
     if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);

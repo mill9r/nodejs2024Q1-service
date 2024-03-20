@@ -17,7 +17,7 @@ export class AlbumsService {
 
   private async preloadArtistById(id: string): Promise<Artist> {
     return await this.artistRepository.findOne({
-      where: { id },
+      where: { artistId: id },
     });
   }
 
@@ -25,7 +25,7 @@ export class AlbumsService {
     const artist = await this.preloadArtistById(album.artistId);
     const createdAlbum = this.albumRepository.create({
       ...album,
-      artistId: artist.id,
+      artistId: artist.artistId,
     });
 
     return this.albumRepository.save(createdAlbum);
@@ -41,7 +41,7 @@ export class AlbumsService {
 
     const updatedAlbum = this.albumRepository.merge(existingAlbum, {
       ...album,
-      artistId: artist.id,
+      artistId: artist.artistId,
     });
 
     return this.albumRepository.save(updatedAlbum);
@@ -66,7 +66,7 @@ export class AlbumsService {
 
   async delete(id: string) {
     const album = await this.albumRepository.findOne({ where: { id } });
-    if (album) {
+    if (!album) {
       throw new CustomNotFoundException(ALBUM_NOT_FOUND);
     }
 

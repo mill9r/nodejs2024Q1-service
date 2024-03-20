@@ -10,7 +10,7 @@ export class Track {
   @Column()
   name: string;
 
-  @ManyToOne(() => Artist, (artist) => artist.id, {
+  @ManyToOne(() => Artist, (artist) => artist.artistId, {
     onDelete: 'SET NULL',
     nullable: true,
   })

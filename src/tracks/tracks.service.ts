@@ -15,18 +15,17 @@ export class TracksService {
     @InjectRepository(Artist) private artistRepository: Repository<Artist>,
   ) {}
   async create(track: TrackDto) {
-    console.log('track:', track);
     const album = await this.albumRepository.findOne({
       where: { id: track.albumId },
     });
     const artist = await this.artistRepository.findOne({
-      where: { id: track.artistId },
+      where: { artistId: track.artistId },
     });
-    console.log(album, artist);
+
     const createdTrack = this.trackRepository.create({
       ...track,
       albumId: album.id,
-      artistId: artist.id,
+      artistId: artist.artistId,
     });
 
     return this.trackRepository.save(createdTrack);
