@@ -64,30 +64,12 @@ export class AlbumsService {
     return album;
   }
 
-  delete(id: string) {
-    // const index = this.dbService.albumRepository.findIndex(
-    //   (user) => user.id === id,
-    // );
-    // if (index === -1) {
-    //   throw new CustomNotFoundException(ALBUM_NOT_FOUND);
-    // }
-    //
-    // const favoriteTrack = this.dbService.favorites.albums.findIndex(
-    //   (t) => t.id === id,
-    // );
-    //
-    // if (favoriteTrack !== -1) {
-    //   this.dbService.favorites.albums.splice(favoriteTrack, 1);
-    // }
-    //
-    // const track = this.dbService.trackRepository.findIndex(
-    //   (t) => t.albumId === id,
-    // );
-    //
-    // if (track !== -1) {
-    //   this.dbService.trackRepository[track].albumId = null;
-    // }
-    //
-    // this.dbService.albumRepository.splice(index, 1);
+  async delete(id: string) {
+    const album = await this.albumRepository.findOne({ where: { id } });
+    if (album) {
+      throw new CustomNotFoundException(ALBUM_NOT_FOUND);
+    }
+
+    return this.albumRepository.delete(album);
   }
 }

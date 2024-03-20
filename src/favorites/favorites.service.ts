@@ -23,7 +23,7 @@ export class FavoritesService {
 
   addTrack(id: string) {
     const track = this.tracksService.get(id);
-    this.dbService.favorites.tracks.push(track);
+    // this.dbService.favorites.tracks.push(track);
   }
 
   deleteTrack(id: string) {

@@ -1,7 +1,27 @@
-export interface Track {
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Artist } from '../../artists/entities/artist.entity';
+import { Album } from '../../albums/entities/album.entity';
+
+@Entity()
+export class Track {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
   name: string;
-  artistId: string | null;
-  albumId: string | null;
+
+  @ManyToOne(() => Artist, (artist) => artist.id, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  artistId: string;
+
+  @ManyToOne(() => Album, (album) => album.id, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  albumId: string;
+
+  @Column()
   duration: number;
 }

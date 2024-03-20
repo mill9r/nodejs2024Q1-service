@@ -35,7 +35,7 @@ export class ArtistsService {
   async get(id: string) {
     const artist = await this.artistRepository.findOne({ where: { id } });
 
-    if (artist) {
+    if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
 
