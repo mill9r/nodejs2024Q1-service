@@ -14,8 +14,6 @@ import { Artist } from '../artists/entities/artist.entity';
 import { Track } from '../tracks/entities/track.entity';
 import { Album } from '../albums/entities/album.entity';
 
-const USER_ID_MOCK = 'cee000df-b9c4-407e-86a9-ae08ab7a85a6';
-
 @Injectable()
 export class FavoritesService {
   constructor(
@@ -31,9 +29,15 @@ export class FavoritesService {
   ) {}
 
   async getAll() {
-    const tracks =  await this.favoriteTracksRepository.find({ relations: ['trackId'] });
-    const artists = await this.favoriteArtistsRepository.find({ relations: ['artistId'] });
-    const albums = await this.favoriteAlbumsRepository.find({ relations: ['albumId'] });
+    const tracks = await this.favoriteTracksRepository.find({
+      relations: ['trackId'],
+    });
+    const artists = await this.favoriteArtistsRepository.find({
+      relations: ['artistId'],
+    });
+    const albums = await this.favoriteAlbumsRepository.find({
+      relations: ['albumId'],
+    });
 
     return {
       artists: artists.map((artist) => artist.artistId),
@@ -90,7 +94,9 @@ export class FavoritesService {
   }
 
   async addArtist(id: string) {
-    const artist = await this.artistRepository.findOne({ where: { artistId:id } });
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
     if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
@@ -104,7 +110,9 @@ export class FavoritesService {
   }
 
   async deleteArtist(id: string) {
-    const artist = await this.artistRepository.findOne({ where: { artistId:id } });
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
     if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }

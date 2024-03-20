@@ -1,8 +1,7 @@
-import { Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Artist } from '../../artists/entities/artist.entity';
 import { Track } from '../../tracks/entities/track.entity';
 import { Album } from '../../albums/entities/album.entity';
-
 
 @Entity()
 export class FavoriteArtists {
@@ -29,7 +28,7 @@ export class FavoriteTracks {
 
   // @PrimaryColumn()
   @ManyToOne(() => Track, (track) => track, {
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   trackId: Track;
 
@@ -40,7 +39,6 @@ export class FavoriteTracks {
   // userId: string;
 }
 
-
 @Entity()
 export class FavoriteAlbums {
   @PrimaryColumn()
@@ -48,7 +46,7 @@ export class FavoriteAlbums {
 
   // @PrimaryColumn()
   @ManyToOne(() => Album, (album) => album, {
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   albumId: Album;
 
@@ -58,4 +56,3 @@ export class FavoriteAlbums {
   // })
   // userId: string;
 }
-
