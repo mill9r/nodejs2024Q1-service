@@ -1,68 +1,121 @@
 import { Injectable } from '@nestjs/common';
-import { DbService } from '../db/db.service';
 import { CustomNotFoundException } from '../exceptions/record-not-exist.exception';
 import { TRACK_NOT_FOUND } from '../tracks/constants/track.constant';
 import { ALBUM_NOT_FOUND } from '../albums/constants/album.constant';
 import { ARTIST_NOT_FOUND } from '../artists/constants/artist.constant';
-import { TracksService } from '../tracks/tracks.service';
-import { AlbumsService } from '../albums/albums.service';
-import { ArtistsService } from '../artists/artists.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  FavoriteAlbums,
+  FavoriteArtists,
+  FavoriteTracks,
+} from './entities/favorite.entity';
+import { Repository } from 'typeorm';
+import { Artist } from '../artists/entities/artist.entity';
+import { Track } from '../tracks/entities/track.entity';
+import { Album } from '../albums/entities/album.entity';
 
 @Injectable()
 export class FavoritesService {
   constructor(
-    private dbService: DbService,
-    private tracksService: TracksService,
-    private albumsService: AlbumsService,
-    private artistsService: ArtistsService,
+    @InjectRepository(FavoriteArtists)
+    private favoriteArtistsRepository: Repository<FavoriteArtists>,
+    @InjectRepository(FavoriteTracks)
+    private favoriteTracksRepository: Repository<FavoriteTracks>,
+    @InjectRepository(FavoriteAlbums)
+    private favoriteAlbumsRepository: Repository<FavoriteAlbums>,
+    @InjectRepository(Artist) private artistRepository: Repository<Artist>,
+    @InjectRepository(Track) private trackRepository: Repository<Track>,
+    @InjectRepository(Album) private albumRepository: Repository<Album>,
   ) {}
 
-  getAll() {
-    return this.dbService.favorites;
+  async getAll() {
+    const tracks = await this.favoriteTracksRepository.find({
+      relations: ['trackId'],
+    });
+    const artists = await this.favoriteArtistsRepository.find({
+      relations: ['artistId'],
+    });
+    const albums = await this.favoriteAlbumsRepository.find({
+      relations: ['albumId'],
+    });
+
+    return {
+      artists: artists.map((artist) => artist.artistId),
+      tracks: tracks.map((track) => track.trackId),
+      albums: albums.map((album) => album.albumId),
+    };
   }
 
-  addTrack(id: string) {
-    const track = this.tracksService.get(id);
-    this.dbService.favorites.tracks.push(track);
-  }
-
-  deleteTrack(id: string) {
-    const index = this.dbService.favorites.tracks.findIndex(
-      (trackId) => trackId.id === id,
-    );
-    if (index === -1) {
+  async addTrack(id: string) {
+    const track = await this.trackRepository.findOne({ where: { id } });
+    if (!track) {
       throw new CustomNotFoundException(TRACK_NOT_FOUND);
     }
-    this.dbService.favorites.tracks.splice(index, 1);
+
+    const favoriteTrack = this.favoriteTracksRepository.create({
+      id,
+      trackId: track,
+    });
+
+    return this.favoriteTracksRepository.save(favoriteTrack);
   }
 
-  addAlbum(id: string) {
-    const album = this.albumsService.get(id);
-    this.dbService.favorites.albums.push(album);
+  async deleteTrack(id: string) {
+    console.log('deleteTrack', id);
+    const track = await this.favoriteTracksRepository.findOne({
+      where: { id },
+    });
+    if (!track) {
+      throw new CustomNotFoundException(TRACK_NOT_FOUND);
+    }
+    return this.favoriteTracksRepository.delete({ id });
   }
 
-  deleteAlbum(id: string) {
-    const index = this.dbService.favorites.albums.findIndex(
-      (album) => album.id === id,
-    );
-    if (index === -1) {
+  async addAlbum(id: string) {
+    const album = await this.albumRepository.findOne({ where: { id } });
+    if (!album) {
       throw new CustomNotFoundException(ALBUM_NOT_FOUND);
     }
-    this.dbService.favorites.albums.splice(index, 1);
+
+    const favoriteAlbum = this.favoriteAlbumsRepository.create({
+      id,
+      albumId: album,
+    });
+
+    return this.favoriteAlbumsRepository.save(favoriteAlbum);
   }
 
-  addArtist(id: string) {
-    const artist = this.artistsService.get(id);
-    this.dbService.favorites.artists.push(artist);
+  async deleteAlbum(id: string) {
+    const album = await this.albumRepository.findOne({ where: { id } });
+    if (!album) {
+      throw new CustomNotFoundException(ALBUM_NOT_FOUND);
+    }
+    return this.favoriteAlbumsRepository.delete({ id });
   }
 
-  deleteArtist(id: string) {
-    const index = this.dbService.favorites.artists.findIndex(
-      (artist) => artist.id === id,
-    );
-    if (index === -1) {
+  async addArtist(id: string) {
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
+    if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
-    this.dbService.favorites.artists.splice(index, 1);
+
+    const favoriteArtist = this.favoriteArtistsRepository.create({
+      id,
+      artistId: artist,
+    });
+
+    return this.favoriteArtistsRepository.save(favoriteArtist);
+  }
+
+  async deleteArtist(id: string) {
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
+    if (!artist) {
+      throw new CustomNotFoundException(ARTIST_NOT_FOUND);
+    }
+    return this.favoriteArtistsRepository.delete({ id });
   }
 }

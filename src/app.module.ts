@@ -6,9 +6,21 @@ import { DbModule } from './db/db.module';
 import { AlbumsModule } from './albums/albums.module';
 import { TracksModule } from './tracks/tracks.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_CONFIG } from './app.config';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: APP_CONFIG.db.host,
+      port: Number(APP_CONFIG.db.port),
+      username: APP_CONFIG.db.username,
+      password: APP_CONFIG.db.password,
+      database: 'postgres',
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
     UsersModule,
     ArtistsModule,
     DbModule,

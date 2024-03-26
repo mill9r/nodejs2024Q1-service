@@ -1,93 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
-import { DbService } from '../db/db.service';
 import { CustomNotFoundException } from '../exceptions/record-not-exist.exception';
 import { ArtistDto } from './dto/artist.dto';
 import { ARTIST_NOT_FOUND } from './constants/artist.constant';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Artist } from './entities/artist.entity';
+import { Repository } from 'typeorm';
 @Injectable()
 export class ArtistsService {
-  constructor(private dbService: DbService) {}
-  create(artist: ArtistDto) {
-    const id = uuidv4();
+  constructor(
+    @InjectRepository(Artist)
+    private readonly artistRepository: Repository<Artist>,
+  ) {}
+  async create(artist: ArtistDto) {
+    const createdArtist = this.artistRepository.create(artist);
 
-    const user = {
-      id,
-      ...artist,
-    };
-    this.dbService.artistRepository.push(user);
-
-    return user;
+    return this.artistRepository.save(createdArtist);
   }
 
-  update(id: string, inUser: ArtistDto) {
-    const artist = this.dbService.artistRepository.find(
-      (user) => user.id === id,
-    );
+  async update(id: string, inUser: ArtistDto) {
+    const artist = await this.artistRepository.preload({
+      artistId: id,
+      ...inUser,
+    });
+    if (!artist) {
+      throw new CustomNotFoundException(ARTIST_NOT_FOUND);
+    }
+    return this.artistRepository.save(artist);
+  }
+
+  async getAll() {
+    return this.artistRepository.find();
+  }
+
+  async get(id: string) {
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
+
     if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
 
-    const updatedUser = {
-      ...artist,
-      ...inUser,
-    };
-
-    this.dbService.artistRepository = [
-      ...this.dbService.artistRepository,
-      updatedUser,
-    ];
-    return updatedUser;
+    return artist;
   }
 
-  getAll() {
-    console.log('this.dbService', this.dbService);
-    return this.dbService.artistRepository;
-  }
+  async delete(id: string) {
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: id },
+    });
 
-  get(id: string) {
-    const index = this.dbService.artistRepository.findIndex(
-      (user) => user.id === id,
-    );
-
-    if (index === -1) {
+    if (!artist) {
       throw new CustomNotFoundException(ARTIST_NOT_FOUND);
     }
 
-    return this.dbService.artistRepository[index];
-  }
-
-  delete(id: string) {
-    const index = this.dbService.artistRepository.findIndex(
-      (user) => user.id === id,
-    );
-    if (index === -1) {
-      throw new CustomNotFoundException(ARTIST_NOT_FOUND);
-    }
-
-    const favoriteArtist = this.dbService.favorites.artists.findIndex(
-      (t) => t.id === id,
-    );
-
-    if (favoriteArtist !== -1) {
-      this.dbService.favorites.artists.splice(favoriteArtist, 1);
-    }
-
-    const track = this.dbService.trackRepository.findIndex(
-      (t) => t.artistId === id,
-    );
-
-    if (track !== -1) {
-      this.dbService.trackRepository[track].artistId = null;
-    }
-
-    const album = this.dbService.albumRepository.findIndex(
-      (t) => t.artistId === id,
-    );
-
-    if (album !== -1 && this.dbService.albumRepository[album].artistId === id) {
-      this.dbService.albumRepository[album].artistId = null;
-    }
-
-    this.dbService.artistRepository.splice(index, 1);
+    return this.artistRepository.delete(id);
   }
 }

@@ -1,76 +1,70 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
-import { DbService } from '../db/db.service';
 import { CustomNotFoundException } from '../exceptions/record-not-exist.exception';
 import { TRACK_NOT_FOUND } from './constants/track.constant';
 import { TrackDto } from './dto/track.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Track } from './entities/track.entity';
+import { Repository } from 'typeorm';
+import { Album } from '../albums/entities/album.entity';
+import { Artist } from '../artists/entities/artist.entity';
 @Injectable()
 export class TracksService {
-  constructor(private dbService: DbService) {}
-  create(artist: TrackDto) {
-    const id = uuidv4();
+  constructor(
+    @InjectRepository(Track) private trackRepository: Repository<Track>,
+    @InjectRepository(Album) private albumRepository: Repository<Album>,
+    @InjectRepository(Artist) private artistRepository: Repository<Artist>,
+  ) {}
+  async create(track: TrackDto) {
+    const album = await this.albumRepository.findOne({
+      where: { id: track.albumId },
+    });
+    const artist = await this.artistRepository.findOne({
+      where: { artistId: track.artistId },
+    });
 
-    const user = {
-      id,
-      ...artist,
-    };
-    this.dbService.trackRepository.push(user);
+    const createdTrack = this.trackRepository.create({
+      ...track,
+      albumId: album.id,
+      artistId: artist.artistId,
+    });
 
-    return user;
+    return this.trackRepository.save(createdTrack);
   }
 
-  update(id: string, inUser: TrackDto) {
-    const artist = this.dbService.trackRepository.find(
-      (user) => user.id === id,
-    );
-    if (!artist) {
+  async update(id: string, inUser: TrackDto) {
+    const track = await this.trackRepository.preload({ id, ...inUser });
+    if (!track) {
       throw new CustomNotFoundException(TRACK_NOT_FOUND);
     }
 
-    const updatedUser = {
-      ...artist,
-      ...inUser,
-    };
-
-    this.dbService.trackRepository = [
-      ...this.dbService.trackRepository,
-      updatedUser,
-    ];
-    return updatedUser;
+    return this.trackRepository.save(track);
   }
 
-  getAll() {
-    return this.dbService.trackRepository;
+  async getAll() {
+    return this.trackRepository.find({
+      relations: ['albumId', 'artistId'],
+    });
   }
 
-  get(id: string) {
-    const index = this.dbService.trackRepository.findIndex(
-      (user) => user.id === id,
-    );
+  async get(id: string) {
+    const track = this.trackRepository.findOne({
+      where: { id },
+      relations: ['albumId', 'artistId'],
+    });
 
-    if (index === -1) {
+    if (!track) {
       throw new CustomNotFoundException(TRACK_NOT_FOUND);
     }
 
-    return this.dbService.trackRepository[index];
+    return track;
   }
 
-  delete(id: string) {
-    const index = this.dbService.trackRepository.findIndex(
-      (user) => user.id === id,
-    );
-    if (index === -1) {
+  async delete(id: string) {
+    const track = this.trackRepository.findOne({ where: { id } });
+    if (!track) {
       throw new CustomNotFoundException(TRACK_NOT_FOUND);
     }
 
-    const track = this.dbService.favorites.tracks.findIndex(
-      (user) => user.id === id,
-    );
-
-    if (track !== -1) {
-      this.dbService.favorites.tracks.splice(track, 1);
-    }
-
-    this.dbService.trackRepository.splice(index, 1);
+    return this.trackRepository.delete(id);
   }
 }
